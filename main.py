@@ -80,7 +80,7 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
         os.makedirs(args.save_dir)
     
     for epoch in range(1, epochs+1):
-        l1 = train_one_epoch(model, train_loader, device, optimizer, epoch, 5)
+        l1 = train_one_epoch(model, train_loader, device, optimizer, epoch)
         l2 = evaluate(model, device, test_loader)
         scheduler.step()
 
