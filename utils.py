@@ -190,6 +190,7 @@ def visualize_samples(args: Any, model: nn.Module):
         ax = fig.add_subplot(5, 3, i+1)
         img = dataset[i][0]
         ax.imshow(img.permute(1,2,0))
+        ax.axis('off')
     
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -207,6 +208,7 @@ def visualize_samples(args: Any, model: nn.Module):
             img_ = img_.detach().cpu().squeeze()
             img_ = unnormalize(img_)
             ax.imshow(img_.permute(1,2,0))
+            ax.axis('off')
     
     plt.savefig( os.path.join(save_dir, 'sample_results.png'), dpi='figure' )
     plt.show()
