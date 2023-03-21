@@ -22,6 +22,16 @@ import torchvision
 import torchvision.transforms as T
 
 
+unnormalize = T.Compose([
+    T.Normalize(
+        mean = [ 0., 0., 0. ],
+        std = [ 1/0.229, 1/0.224, 1/0.225 ]),
+    T.Normalize(
+        mean = [ -0.485, -0.456, -0.406 ],
+        std = [ 1., 1., 1. ]),
+])
+
+
 class ZipDataset(Dataset):
     def __init__(self, root_path, cache_into_memory=False):
         if cache_into_memory:
@@ -195,6 +205,7 @@ def visualize_samples(args: Any, model: nn.Module):
             img = dataset[i][0].to(device)
             img_ = model(img.unsqueeze(0))
             img_ = img_.detach().cpu().squeeze()
+            img_ = unnormalize(img_)
             ax.imshow(img_.permute(1,2,0))
     
     plt.savefig( os.path.join(save_dir, 'sample_results.png'), dpi='figure' )
