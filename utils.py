@@ -113,6 +113,7 @@ def parse():
     parser.add_argument('--save_dir', type=str, default='results')
     parser.add_argument('--data_dir', type=str, default='data/', help='Root dir of data')
     parser.add_argument('--device', type=str, default='cpu', help='Device to train on')
+    parser.add_argument('--visualize', action='store_true', help='flag to visualize some results')
 
     args = parser.parse_args()
     return args
