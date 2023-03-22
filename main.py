@@ -143,9 +143,9 @@ if __name__ == '__main__':
     elif args.visualize:
         model = Autoencoder(depth=args.decoder_depth)
         if args.model_path[-4:] == '.pth':
-            model.load_state_dict( torch.load(args.model_path) )
+            model.load_state_dict( torch.load(args.model_path, map_location=torch.device('cpu')) )
         elif args.model_path[-5:] == '.ckpt':
-            ckpt = torch.load(args.model_path)
+            ckpt = torch.load(args.model_path, map_location=torch.device('cpu'))
             state_dict = ckpt['model_state_dict']
             model.load_state_dict(state_dict)
         visualize_samples(args, model)
