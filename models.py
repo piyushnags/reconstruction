@@ -42,7 +42,7 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         model = mobilenet_v3_large()
         if pretrained:
-            state_dict = MobileNet_V3_Large_Weights.IMAGENET1K_V2.get_state_dict()
+            state_dict = MobileNet_V3_Large_Weights.IMAGENET1K_V2.get_state_dict(progress=True)
             model.load_state_dict(state_dict)
         
         backbone = model.features
