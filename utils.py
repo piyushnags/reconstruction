@@ -16,6 +16,7 @@ import cv2
 # PyTorch Imports
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch import Tensor
 from torch.utils.data import Dataset, DataLoader
 import torchvision
@@ -216,3 +217,19 @@ def visualize_samples(args: Any, model: nn.Module):
     
     plt.savefig( os.path.join(save_dir, 'sample_results.png'), dpi='figure' )
     plt.show()
+
+
+def kl_divergence(rho, rho_hat, device):
+    rho_hat = torch.mean(F.sigmoid(rho_hat), 1) # sigmoid because we need the probability distributions
+    rho = torch.tensor([rho] * len(rho_hat)).to(device)
+    return torch.sum(rho * torch.log(rho/rho_hat) + (1 - rho) * torch.log((1 - rho)/(1 - rho_hat)))
+
+
+def sparse_loss(rho, images, model):
+    model_children = list(model.children())
+    values = images
+    loss = 0
+    for i in range(len(model_children)):
+        values = model_children[i](values)
+        loss += kl_divergence(rho, values)
+    return loss

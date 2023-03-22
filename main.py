@@ -24,6 +24,8 @@ def train_one_epoch(model, train_loader, device, optimizer, epoch):
     out = model(img)
 
     loss = loss_fn(out, target)
+    sparsity = sparse_loss(0.05, target)
+    loss += 0.001*sparsity
     loss.backward()
 
     epoch_losses.append(loss.item())
