@@ -20,17 +20,17 @@ def train_one_epoch(model, train_loader, device, optimizer, epoch):
     for batch_idx, (img, target) in enumerate(tqdm(train_loader)):
         img, target = img.to(device), target.to(device)
 
-    optimizer.zero_grad()
-    out = model(img)
+        optimizer.zero_grad()
+        out = model(img)
 
-    loss = loss_fn(out, target)
-    sparsity = sparse_loss(0.05, target)
-    loss += 0.001*sparsity
-    loss.backward()
+        loss = loss_fn(out, target)
+        # sparsity = sparse_loss(0.05, target)
+        # loss += 0.001*sparsity
+        loss.backward()
 
-    epoch_losses.append(loss.item())
+        epoch_losses.append(loss.item())
 
-    optimizer.step()
+        optimizer.step()
 
     avg_loss = sum(epoch_losses)/len(epoch_losses)
     print("\n\nAverage Training Loss for Epoch {}: {:.6f}".format(epoch, avg_loss)) 
