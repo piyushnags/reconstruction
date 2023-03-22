@@ -141,11 +141,16 @@ if __name__ == '__main__':
         avg_loss = evaluate(model, device, val_loader)
     
     elif args.visualize:
-        model = Autoencoder(depth=args.decoder_depth)
+        if args.device == 'cuda':
+            device = torch.device( 'cuda' if torch.cuda.is_available() else 'cpu' )
+        else:
+            device = torch.device('cpu')
+        model = Autoencoder(depth=args.decoder_depth).to(device)
+
         if args.model_path[-4:] == '.pth':
-            model.load_state_dict( torch.load(args.model_path, map_location=torch.device('cpu')) )
+            model.load_state_dict( torch.load(args.model_path, map_location=device) )
         elif args.model_path[-5:] == '.ckpt':
-            ckpt = torch.load(args.model_path, map_location=torch.device('cpu'))
+            ckpt = torch.load(args.model_path, map_location=device)
             state_dict = ckpt['model_state_dict']
             model.load_state_dict(state_dict)
         visualize_samples(args, model)
