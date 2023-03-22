@@ -147,7 +147,7 @@ def get_loaders(args: Any) -> Tuple[DataLoader, DataLoader]:
     val_batches = (args.num_batches // 11) * args.batch_size
     train_batches = (args.num_batches - val_batches) * args.batch_size    
     train_data, val_data, _ = torch.utils.data.random_split(
-        dataset, [train_batches, val_batches, len(dataset) - train_batches - val_batches]
+        dataset, [train_batches, val_batches, len(dataset) - args.batch_size*args.num_batches]
     )
     train_loader = DataLoader(train_data, args.batch_size, shuffle=True, num_workers=2)
     val_loader = DataLoader(val_data, args.batch_size, num_workers=2)
