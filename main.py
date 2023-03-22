@@ -111,7 +111,7 @@ if __name__ == '__main__':
     args = parse()
     if args.train:
         train_loader, val_loader = get_loaders(args)
-        model = Autoencoder()
+        model = Autoencoder( args.use_pretrained )
         train_losses, val_losses = train(args, model, train_loader, val_loader)
         plot_losses(args, train_losses, val_losses)
         visualize_samples(args, model)
