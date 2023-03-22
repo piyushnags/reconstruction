@@ -93,6 +93,9 @@ class Autoencoder(nn.Module):
     def __init__(self, pretrained: bool = False, depth: str = 'light'):
         super(Autoencoder, self).__init__()
         self.encoder = Encoder(pretrained)
+        if pretrained:
+            for p in self.encoder.parameters():
+                p.requires_grad_(False)
         self.decoder = Decoder(depth)        
         
     
