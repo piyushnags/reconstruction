@@ -63,6 +63,8 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
 
     epochs = args.num_epochs
     params = [p for p in model.parameters() if p.requires_grad]
+    trainable = [p.numel() for p in params]
+    print("No. of trainable parameters: {}".format(len(trainable)))
     model.to(device)
     
     if args.optim == 'adam':

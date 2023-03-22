@@ -66,6 +66,15 @@ class Decoder(nn.Module):
                 ConvTranspose(672, 16, 4),
                 ConvTranspose(16, 3, 4, 'relu'),
             )
+        elif depth == 'medium':
+            layers = nn.Sequential(
+                ConvTranspose(672, 112, 1),
+                ConvTranspose(112, 80, 2),
+                ConvTranspose(80, 80, 2),
+                ConvTranspose(80, 16, 1),
+                ConvTranspose(16, 16, 4),
+                ConvTranspose(16, 3, 1, 'relu')
+            ) 
         elif depth == 'deep':
             layers = nn.Sequential(
                 ConvTranspose(672, 112, 1),
