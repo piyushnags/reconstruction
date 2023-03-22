@@ -111,7 +111,7 @@ if __name__ == '__main__':
     args = parse()
     if args.train:
         train_loader, val_loader = get_loaders(args)
-        model = Autoencoder( args.use_pretrained )
+        model = Autoencoder( args.use_pretrained, depth=args.decoder_depth )
         train_losses, val_losses = train(args, model, train_loader, val_loader)
         plot_losses(args, train_losses, val_losses)
         visualize_samples(args, model)
@@ -120,7 +120,7 @@ if __name__ == '__main__':
         if not os.path.exists(args.model_path):
             raise ValueError('Model path is invalid!')
 
-        model = Autoencoder()
+        model = Autoencoder(depth=args.decoder_depth)
         
         if args.eval_pth:
             state_dict = torch.load(args.eval_pth)
@@ -139,7 +139,7 @@ if __name__ == '__main__':
         avg_loss = evaluate(model, device, val_loader)
     
     elif args.visualize:
-        model = Autoencoder()
+        model = Autoencoder(depth=args.decoder_depth)
         if args.model_path[-4:] == '.pth':
             model.load_state_dict( torch.load(args.model_path) )
         elif args.model_path[-5:] == '.ckpt':

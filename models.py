@@ -66,6 +66,18 @@ class Decoder(nn.Module):
                 ConvTranspose(672, 16, 4),
                 ConvTranspose(16, 3, 4, 'relu'),
             )
+        elif depth == 'deep':
+            layers = nn.Sequential(
+                ConvTranspose(672, 112, 1),
+                ConvTranspose(112, 112, 2),
+                ConvTranspose(112, 480, 1),
+                ConvTranspose(480, 480, 2),
+                ConvTranspose(480, 80, 1),
+                ConvTranspose(80, 80, 2),
+                ConvTranspose(80, 16, 1),
+                ConvTranspose(16, 16, 2),
+                ConvTranspose(16, 3, 1, 'relu')
+            )
         else:
             raise ValueError('Invalid Decoder depth configuration')
         
@@ -78,10 +90,10 @@ class Decoder(nn.Module):
 
 
 class Autoencoder(nn.Module):
-    def __init__(self, pretrained: bool = False):
+    def __init__(self, pretrained: bool = False, depth: str = 'light'):
         super(Autoencoder, self).__init__()
         self.encoder = Encoder(pretrained)
-        self.decoder = Decoder()        
+        self.decoder = Decoder(depth)        
         
     
     def forward(self, x: Tensor) -> Tensor:
