@@ -145,7 +145,7 @@ def get_loaders(args: Any) -> Tuple[DataLoader, DataLoader]:
     dataset = AutoDataset(zip_dataset, augment)
 
     val_batches = (args.num_batches // 11) * args.batch_size
-    train_batches = (args.num_batches - val_batches) * args.batch_size    
+    train_batches = (args.num_batches - (args.num_batches // 11) ) * args.batch_size    
     train_data, val_data, _ = torch.utils.data.random_split(
         dataset, [train_batches, val_batches, len(dataset) - args.batch_size*args.num_batches]
     )
