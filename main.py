@@ -54,8 +54,8 @@ def evaluate(model, device, test_loader):
 
 
 def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: DataLoader):
-    print('Number of Training samples: {}'.format(len(train_loader)))
-    print('Number of Validation samples: {}'.format(len(test_loader)))
+    print('Number of Training samples: {}'.format(len(train_loader)*args.batch_size))
+    print('Number of Validation samples: {}'.format(len(test_loader)*args.batch_size))
     if args.device == 'cuda':
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     else:
