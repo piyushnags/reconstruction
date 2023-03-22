@@ -54,6 +54,8 @@ def evaluate(model, device, test_loader):
 
 
 def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: DataLoader):
+    print('Number of Training samples: {}'.format(len(train_loader)))
+    print('Number of Validation samples: {}'.format(len(test_loader)))
     if args.device == 'cuda':
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     else:
@@ -87,7 +89,7 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
         train_losses.append(l1)
         val_losses.append(l2)
   
-        if epoch % 5 == 0:
+        if epoch % args.log_interval == 0:
             torch.save(
                 {
                     "epoch":epoch,
@@ -138,6 +140,10 @@ if __name__ == '__main__':
     
     elif args.visualize:
         model = Autoencoder()
-        if args.model_path:
+        if args.model_path[-4:] == '.pth':
             model.load_state_dict( torch.load(args.model_path) )
+        elif args.model_path[-5:] == '.ckpt':
+            ckpt = torch.load(args.model_path)
+            state_dict = ckpt['model_state_dict']
+            model.load_state_dict(state_dict)
         visualize_samples(args, model)
