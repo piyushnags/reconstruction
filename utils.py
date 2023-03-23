@@ -239,7 +239,7 @@ def sparse_loss(rho, images, model):
     layers = list( layers.children() )[0]
     values = images
     loss = 0
-    for i in range(layers):
+    for i in range(len(layers)):
         values = layers[i](values)
         loss += kl_divergence(rho, values)
     return loss
