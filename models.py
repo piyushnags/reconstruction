@@ -9,6 +9,7 @@ from torchvision.models import (
     mobilenet_v3_large,
     MobileNet_V3_Large_Weights
 )
+from utils import unnormalize
 
 
 
@@ -107,6 +108,21 @@ class Autoencoder(nn.Module):
                 p.requires_grad_(False)
         self.decoder = Decoder(depth)        
         
+    
+    def inspect_result(self, x: Tensor):
+        print("Max value of input is: {}".format( torch.max(x) ))
+        print("Min value of input is: {}".format( torch.min(x) ))
+        print("Std deviation of input is: {}".format( torch.std(x) ))
+        print("Average of input is: {}".format( torch.mean(x) ))
+
+        x = self.forward(x)
+        x = unnormalize(x)
+
+        print("Max value of output is: {}".format( torch.max(x) ))
+        print("Min value of output is: {}".format( torch.min(x) ))
+        print("Std deviation of output is: {}".format( torch.std(x) ))
+        print("Average of output is: {}".format( torch.mean(x) ))
+
     
     def forward(self, x: Tensor) -> Tensor:
         x = self.encoder(x)

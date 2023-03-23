@@ -218,6 +218,10 @@ def visualize_samples(args: Any, model: nn.Module):
     plt.savefig( os.path.join(save_dir, 'sample_results.png'), dpi='figure' )
     plt.show()
 
+    test_img = dataset[0][0].to(device)
+    with torch.no_grad():
+        model.inspect_result(test_img.unsqueeze(0))
+
 
 def kl_divergence(rho, rho_hat, device):
     rho_hat = torch.mean(F.sigmoid(rho_hat), 1) # sigmoid because we need the probability distributions
