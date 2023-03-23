@@ -232,6 +232,7 @@ def kl_divergence(rho, rho_hat, device):
     rho_hat = torch.mean(torch.sigmoid(rho_hat), 1) # sigmoid because we need the probability distributions
     print(rho_hat.shape)
     rho = torch.tensor([rho] * len(rho_hat)).to(device)
+    print(rho.shape)
     return torch.sum(rho * torch.log(rho/rho_hat) + (1 - rho) * torch.log((1 - rho)/(1 - rho_hat)))
 
 
