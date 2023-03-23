@@ -14,8 +14,7 @@ from torch.utils.data import DataLoader
 def train_one_epoch(
         model, train_loader, device, 
         optimizer, epoch, sparse=False,
-        sparse_rho = 0.05,
-        sparse_beta = 0.001
+        sparse_reg=1e-3
     ):
     model.train()
   
@@ -30,7 +29,7 @@ def train_one_epoch(
 
         loss = loss_fn(out, target)
         if sparse:
-            loss += model._compute_l1_loss()
+            loss += sparse_reg*model._compute_l1_loss()
         loss.backward()
 
         epoch_losses.append(loss.item())
