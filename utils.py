@@ -237,10 +237,12 @@ def sparse_loss(rho, images, model, device):
     layers1 = model.encoder.backbone
     layers2 = model.decoder.layers
     layers = nn.Sequential(*layers1, *layers2)
+    kl = nn.KLDivLoss(reduction='batchmean')
     layers = list( layers.children() )
     values = images
     loss = 0
     for i in range(len(layers)):
         values = layers[i](values)
-        loss += kl_divergence(rho, values, device)
+        loss += kl(torch.log(rho*torch.ones_like(values)), values)
+        # loss += kl_divergence(rho, values, device)
     return loss
