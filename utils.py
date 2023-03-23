@@ -129,6 +129,8 @@ def parse():
     parser.add_argument('--data_dir', type=str, default='data/', help='Root dir of data')
     parser.add_argument('--device', type=str, default='cpu', help='Device to train on')
     parser.add_argument('--visualize', action='store_true', help='flag to visualize some results')
+    parser.add_argument('--noise_var', type=float, default=0.05, help='Variance of Additive Gaussian Noise used during augmentation')
+    parser.add_argument('--noise_mean', type=float, default=0.05, help='Mean of Additive Gaussian Noise used during augmentation')
 
     args = parser.parse_args()
     return args
@@ -144,8 +146,10 @@ def get_dataset(root: str) -> ZipDataset:
 def get_loaders(args: Any) -> Tuple[DataLoader, DataLoader]:
     zip_dataset = get_dataset(args.data_dir)
 
+    g_var = args.noise_var
+    g_mean = args.noise_mean
     augment = T.Compose([
-        AddNoise(0.05, 0.05)
+        AddNoise(g_var, g_mean)
     ])
     dataset = AutoDataset(zip_dataset, augment)
 
