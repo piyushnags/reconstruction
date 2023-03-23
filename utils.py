@@ -234,7 +234,7 @@ def kl_divergence(rho, rho_hat, device):
     return torch.sum(rho * torch.log(rho/rho_hat) + (1 - rho) * torch.log((1 - rho)/(1 - rho_hat)))
 
 
-def sparse_loss(rho, images, model):
+def sparse_loss(rho, images, model, device):
     layers1 = model.encoder.backbone
     layers2 = model.decoder.layers
     layers = nn.Sequential(*layers1, *layers2)
@@ -243,5 +243,5 @@ def sparse_loss(rho, images, model):
     loss = 0
     for i in range(len(layers)):
         values = layers[i](values)
-        loss += kl_divergence(rho, values)
+        loss += kl_divergence(rho, values, device)
     return loss
