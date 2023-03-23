@@ -243,6 +243,6 @@ def sparse_loss(rho, images, model, device):
     loss = 0
     for i in range(len(layers)):
         values = layers[i](values)
-        loss += kl(torch.log(rho*torch.ones_like(values)), values)
+        loss += kl(torch.log(rho*torch.ones_like(values)), values).to(device)
         # loss += kl_divergence(rho, values, device)
     return loss
