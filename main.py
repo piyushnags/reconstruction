@@ -11,7 +11,12 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 
 
-def train_one_epoch(model, train_loader, device, optimizer, epoch):
+def train_one_epoch(
+        model, train_loader, device, 
+        optimizer, epoch, sparse=False,
+        sparse_rho = 0.05,
+        sparse_beta = 0.001
+    ):
     model.train()
   
     loss_fn = nn.MSELoss()
@@ -24,8 +29,9 @@ def train_one_epoch(model, train_loader, device, optimizer, epoch):
         out = model(img)
 
         loss = loss_fn(out, target)
-        # sparsity = sparse_loss(0.05, target)
-        # loss += 0.001*sparsity
+        if sparse:
+            sparsity = sparse_loss(sparse_rho, target)
+            loss += sparse_beta*sparsity
         loss.backward()
 
         epoch_losses.append(loss.item())
@@ -86,7 +92,7 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
         os.makedirs(args.save_dir)
     
     for epoch in range(1, epochs+1):
-        l1 = train_one_epoch(model, train_loader, device, optimizer, epoch)
+        l1 = train_one_epoch(model, train_loader, device, optimizer, epoch, args.sparse)
         l2 = evaluate(model, device, test_loader)
         scheduler.step()
 

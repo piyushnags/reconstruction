@@ -115,6 +115,7 @@ def parse():
     # Model config
     parser.add_argument('--use_pretrained', action='store_true', help='Uses pretrained mobilenet backbone')
     parser.add_argument('--decoder_depth', type=str, default='light', help='Depth/complexity of the decoder. Light does not work well at all')
+    parser.add_argument('--sparse', action='store_true', help='Flag to enable sparse loss i.e., Sparse Autoencoder')
     
     # Resume Training
     parser.add_argument('--resume', action='store_true', help='flag to resume training from checkpoint')
@@ -234,10 +235,11 @@ def kl_divergence(rho, rho_hat, device):
 
 
 def sparse_loss(rho, images, model):
-    model_children = list(model.children())
+    layers = model.decoder
+    layers = list( layers.children() )[0]
     values = images
     loss = 0
-    for i in range(len(model_children)):
-        values = model_children[i](values)
+    for i in range(layers):
+        values = layers[i](values)
         loss += kl_divergence(rho, values)
     return loss
