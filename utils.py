@@ -229,7 +229,7 @@ def visualize_samples(args: Any, model: nn.Module):
 
 def kl_divergence(rho, rho_hat, device):
     print(rho_hat.shape)
-    rho_hat = torch.mean(torch.sigmoid(rho_hat), 1) # sigmoid because we need the probability distributions
+    rho_hat = torch.mean(torch.sigmoid(rho_hat), 0) # sigmoid because we need the probability distributions
     print(rho_hat.shape)
     rho = torch.tensor([rho] * len(rho_hat)).to(device)
     print(rho.shape)
