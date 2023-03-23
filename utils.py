@@ -225,24 +225,3 @@ def visualize_samples(args: Any, model: nn.Module):
     test_img = dataset[0][0].to(device)
     with torch.no_grad():
         model.inspect_result(test_img.unsqueeze(0))
-
-
-def kl_divergence(rho, rho_hat, device):
-    rho_hat = torch.mean(torch.sigmoid(rho_hat), 0) # sigmoid because we need the probability distributions
-    rho = torch.tensor([rho] * rho_hat.size(1)).to(device)
-    return torch.sum(rho * torch.log(rho/rho_hat) + (1 - rho) * torch.log((1 - rho)/(1 - rho_hat)))
-
-
-def sparse_loss(rho, images, model, device):
-    layers1 = model.encoder.backbone
-    layers2 = model.decoder.layers
-    layers = nn.Sequential(*layers1, *layers2)
-    kl = nn.KLDivLoss(reduction='batchmean')
-    layers = list( layers.children() )
-    values = images
-    loss = 0
-    for i in range(len(layers)):
-        values = layers[i](values)
-        loss += kl(torch.log(rho*torch.ones_like(values)).to(device), values)
-        # loss += kl_divergence(rho, values, device)
-    return loss

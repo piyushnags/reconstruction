@@ -122,6 +122,13 @@ class Autoencoder(nn.Module):
         print("Min value of output is: {}".format( torch.min(x) ))
         print("Std deviation of output is: {}".format( torch.std(x) ))
         print("Average of output is: {}".format( torch.mean(x) ))
+    
+
+    def _compute_l1_loss(self) -> Tensor:
+        loss = 0
+        for p in self.parameters():
+            loss += torch.sum( torch.abs(p) )
+        return loss
 
     
     def forward(self, x: Tensor) -> Tensor:

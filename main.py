@@ -30,8 +30,7 @@ def train_one_epoch(
 
         loss = loss_fn(out, target)
         if sparse:
-            sparsity = sparse_loss(sparse_rho, target, model, device)
-            loss += sparse_beta*sparsity
+            loss += model._compute_l1_loss()
         loss.backward()
 
         epoch_losses.append(loss.item())
