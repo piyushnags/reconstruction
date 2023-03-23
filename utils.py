@@ -16,7 +16,6 @@ import cv2
 # PyTorch Imports
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torch import Tensor
 from torch.utils.data import Dataset, DataLoader
 import torchvision
@@ -229,7 +228,9 @@ def visualize_samples(args: Any, model: nn.Module):
 
 
 def kl_divergence(rho, rho_hat, device):
-    rho_hat = torch.mean(F.sigmoid(rho_hat), 1) # sigmoid because we need the probability distributions
+    print(rho_hat.shape)
+    rho_hat = torch.mean(torch.sigmoid(rho_hat), 1) # sigmoid because we need the probability distributions
+    print(rho_hat.shape)
     rho = torch.tensor([rho] * len(rho_hat)).to(device)
     return torch.sum(rho * torch.log(rho/rho_hat) + (1 - rho) * torch.log((1 - rho)/(1 - rho_hat)))
 
