@@ -235,8 +235,10 @@ def kl_divergence(rho, rho_hat, device):
 
 
 def sparse_loss(rho, images, model):
-    layers = model.decoder
-    layers = list( layers.children() )[0]
+    layers1 = model.encoder.backbone
+    layers2 = model.decoder.layers
+    layers = nn.Sequential(*layers1, *layers2)
+    layers = list( layers.children() )
     values = images
     loss = 0
     for i in range(len(layers)):
