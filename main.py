@@ -30,7 +30,7 @@ def train_one_epoch(
 
         loss = loss_fn(out, target)
         if sparse:
-            sparsity = sparse_loss(sparse_rho, target)
+            sparsity = sparse_loss(sparse_rho, target, model)
             loss += sparse_beta*sparsity
         loss.backward()
 
