@@ -130,6 +130,7 @@ def parse():
     parser.add_argument('--data_dir', type=str, default='data/', help='Root dir of data')
     parser.add_argument('--device', type=str, default='cpu', help='Device to train on')
     parser.add_argument('--visualize', action='store_true', help='flag to visualize some results')
+    parser.add_argument('--test_noise', action='store_true', help='flag to enable additive noise when visuaizing results')
     parser.add_argument('--noise_var', type=float, default=0.05, help='Variance of Additive Gaussian Noise used during augmentation')
     parser.add_argument('--noise_mean', type=float, default=0.05, help='Mean of Additive Gaussian Noise used during augmentation')
     parser.add_argument('--sparse_reg', type=float, default=1e-3, help='regularization for l1 sparsity')
@@ -185,7 +186,12 @@ def plot_losses(args: Any, train_losses: List, val_losses: List):
 
 def visualize_samples(args: Any, model: nn.Module):
     zip_dataset = get_dataset(args.data_dir)
-    dataset = AutoDataset(zip_dataset, transforms=None)
+    augment = None
+    if args.test_noise:
+        augment = T.Compose([
+            AddNoise(args.noise_var, args.noise_mean)
+        ])
+    dataset = AutoDataset(zip_dataset, augment)
     
     save_dir = args.save_dir
     if args.device == 'cuda':
