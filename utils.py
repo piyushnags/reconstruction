@@ -111,6 +111,7 @@ def parse():
     parser.add_argument('--log_interval', type=int, default=5, help='Frequency of logging checkpoints')
     parser.add_argument('--batch_size', type=int, default=128, help='batch size for training and validation')
     parser.add_argument('--num_batches', type=int, default=330, help='Total training batches for training and validation split as 90/10')
+    parser.add_argument('--aug', action='store_true', help='Flag to enable augmentation with Gaussian noise')
     
     # Model config
     parser.add_argument('--use_pretrained', action='store_true', help='Uses pretrained mobilenet backbone')
@@ -151,11 +152,13 @@ def get_dataset(root: str) -> ZipDataset:
 def get_loaders(args: Any) -> Tuple[DataLoader, DataLoader]:
     zip_dataset = get_dataset(args.data_dir)
 
-    g_var = args.noise_var
-    g_mean = args.noise_mean
-    augment = T.Compose([
-        AddNoise(g_var, g_mean)
-    ])
+    augment = None
+    if args.aug:
+        g_var = args.noise_var
+        g_mean = args.noise_mean
+        augment = T.Compose([
+            AddNoise(g_var, g_mean)
+        ])
     dataset = AutoDataset(zip_dataset, augment)
 
     val_batches = (args.num_batches // 11) * args.batch_size
