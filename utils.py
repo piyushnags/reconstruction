@@ -133,6 +133,8 @@ def parse():
     parser.add_argument('--test_noise', action='store_true', help='flag to enable additive noise when visuaizing results')
     parser.add_argument('--noise_var', type=float, default=0.05, help='Variance of Additive Gaussian Noise used during augmentation')
     parser.add_argument('--noise_mean', type=float, default=0.05, help='Mean of Additive Gaussian Noise used during augmentation')
+    parser.add_argument('--test_noise_var', type=float, default=0.05, help='Variance of Additive Gaussian Noise when testing')
+    parser.add_argument('--test_noise_mean', type=float, default=0.05, help='Mean of Additive Gaussian Noise when testing')
     parser.add_argument('--sparse_reg', type=float, default=1e-3, help='regularization for l1 sparsity')
 
     args = parser.parse_args()
@@ -189,7 +191,7 @@ def visualize_samples(args: Any, model: nn.Module):
     augment = None
     if args.test_noise:
         augment = T.Compose([
-            AddNoise(args.noise_var, args.noise_mean)
+            AddNoise(args.test_noise_var, args.test_noise_mean)
         ])
     dataset = AutoDataset(zip_dataset, augment)
     
