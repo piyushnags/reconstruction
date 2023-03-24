@@ -82,9 +82,10 @@ class AutoDataset(Dataset):
 
     def __getitem__(self, idx):
         img = self.dset[idx]
+        img_ = self.preprocess(img)
+        img = self.preprocess(img)
 
         if self.transforms is not None:
-            img = self.preprocess(img)
             img_ = self.transforms(img)
         
         return img_, img
@@ -184,10 +185,7 @@ def plot_losses(args: Any, train_losses: List, val_losses: List):
 
 def visualize_samples(args: Any, model: nn.Module):
     zip_dataset = get_dataset(args.data_dir)
-    augment = T.Compose([
-        AddNoise(0.05, 0.05)
-    ])
-    dataset = AutoDataset(zip_dataset, augment)
+    dataset = AutoDataset(zip_dataset, transforms=None)
     
     save_dir = args.save_dir
     if args.device == 'cuda':
