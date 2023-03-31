@@ -103,7 +103,8 @@ class Autoencoder(nn.Module):
     def __init__(self, pretrained: bool = False, depth: str = 'light', noisy: bool = False):
         super(Autoencoder, self).__init__()
         self.noisy = noisy
-        self.noise = torch.randn()
+        self.noise = torch.randn((1, 672, 30, 30))*0.03 + 0.03
+        self.register_buffer('noise', self.noise)
         self.encoder = Encoder(pretrained)
         if pretrained:
             for p in self.encoder.parameters():
