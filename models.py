@@ -103,6 +103,7 @@ class Autoencoder(nn.Module):
     def __init__(self, pretrained: bool = False, depth: str = 'light', noisy: bool = False):
         super(Autoencoder, self).__init__()
         self.noisy = noisy
+        self.noise = torch.randn()
         self.encoder = Encoder(pretrained)
         if pretrained:
             for p in self.encoder.parameters():
@@ -135,6 +136,7 @@ class Autoencoder(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         x = self.encoder(x)
         if self.noisy:
+            print(x.size())
             noise = nn.Parameter(torch.randn(x.size())*0.03 + 0.03)
             x += noise
         x = self.decoder(x)
