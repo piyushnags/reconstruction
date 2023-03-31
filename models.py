@@ -137,8 +137,8 @@ class Autoencoder(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         x = self.encoder(x)
         if self.noisy:
-            print(x.size())
-            noise = nn.Parameter(torch.randn(x.size())*0.03 + 0.03)
+            noise = (torch.randn(x.size())*0.03 + 0.03)
+            noise = noise.to( torch.device('cuda' if torch.cuda.is_available() else 'cpu') )
             x += noise
         x = self.decoder(x)
         return x
