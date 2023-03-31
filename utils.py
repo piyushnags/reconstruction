@@ -231,7 +231,7 @@ def visualize_samples(args: Any, model: nn.Module):
             img_ = img_.detach().cpu().squeeze()
             img_ = unnormalize(img_)
             ax.imshow(img_.permute(1,2,0))
-            plt.imsave('sample_{}.png'.format(i), img.permute(1,2,0).numpy(), format='png')
+            plt.imsave('sample_{}.png'.format(i), img_.permute(1,2,0).numpy(), format='png')
             ax.axis('off')
     
     plt.savefig( os.path.join(save_dir, 'sample_results.png'), dpi='figure' )
