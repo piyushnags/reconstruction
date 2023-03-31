@@ -135,6 +135,7 @@ class Autoencoder(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         x = self.encoder(x)
         if self.noisy:
-            x = AddNoise(0.03, 0.03, clip=False)(x)
+            noise = (torch.randn(x.size(), requires_grad=True)*0.03 + 0.03)
+            x += noise
         x = self.decoder(x)
         return x
