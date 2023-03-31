@@ -136,7 +136,8 @@ class Autoencoder(nn.Module):
         x = self.encoder(x)
         if self.noisy:
             noise = (torch.randn(x.size())*0.03 + 0.03)
-            noise = noise.to( torch.device('cuda' if torch.cuda.is_available() else 'cpu') )
+            if x.get_device() != -1:
+                noise = noise.to( torch.device('cuda' if torch.cuda.is_available() else 'cpu') )
             x += noise
         x = self.decoder(x)
         return x
