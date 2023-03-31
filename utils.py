@@ -56,14 +56,17 @@ class ZipDataset(Dataset):
 
 
 class AddNoise(object):
-    def __init__(self, var=0.1, mean=0.):
+    def __init__(self, var=0.1, mean=0., clip: bool = True):
         self.std = var**0.5
         self.mean = mean
+        self.clip = clip
   
 
     def __call__(self, x: Tensor) -> Tensor:
         x += (torch.randn(x.size())*self.std + self.mean)
-        return torch.clamp(x, 0, 1)
+        if self.clip:
+            x = torch.clamp(x, 0, 1)
+        return x
 
 
 class AutoDataset(Dataset):
@@ -117,6 +120,7 @@ def parse():
     parser.add_argument('--use_pretrained', action='store_true', help='Uses pretrained mobilenet backbone')
     parser.add_argument('--decoder_depth', type=str, default='light', help='Depth/complexity of the decoder. Light does not work well at all')
     parser.add_argument('--sparse', action='store_true', help='Flag to enable sparse loss i.e., Sparse Autoencoder')
+    parser.add_argument('--noisy', action='store_true', help='Flag to add noise to feature maps')
     
     # Resume Training
     parser.add_argument('--resume', action='store_true', help='flag to resume training from checkpoint')

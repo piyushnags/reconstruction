@@ -9,7 +9,7 @@ from torchvision.models import (
     mobilenet_v3_large,
     MobileNet_V3_Large_Weights
 )
-from utils import unnormalize
+from utils import unnormalize, AddNoise
 
 
 
@@ -100,8 +100,9 @@ class Decoder(nn.Module):
 
 
 class Autoencoder(nn.Module):
-    def __init__(self, pretrained: bool = False, depth: str = 'light'):
+    def __init__(self, pretrained: bool = False, depth: str = 'light', noisy: bool = False):
         super(Autoencoder, self).__init__()
+        self.noisy = noisy
         self.encoder = Encoder(pretrained)
         if pretrained:
             for p in self.encoder.parameters():
@@ -133,5 +134,7 @@ class Autoencoder(nn.Module):
     
     def forward(self, x: Tensor) -> Tensor:
         x = self.encoder(x)
+        if self.noisy:
+            x = AddNoise(0.03, 0.03, clip=False)(x)
         x = self.decoder(x)
         return x
