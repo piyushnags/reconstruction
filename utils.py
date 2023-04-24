@@ -120,7 +120,7 @@ def parse():
     parser.add_argument('--use_pretrained', action='store_true', help='Uses pretrained mobilenet backbone')
     parser.add_argument('--decoder_depth', type=str, default='light', help='Depth/complexity of the decoder. Light does not work well at all')
     parser.add_argument('--sparse', action='store_true', help='Flag to enable sparse loss i.e., Sparse Autoencoder')
-    parser.add_argument('--noisy', action='store_true', help='Flag to add noise to feature maps')
+    parser.add_argument('--interpolation', type=str, default='transpose', help='Interpolation type during reconstruction in decoder')
     
     # Resume Training
     parser.add_argument('--resume', action='store_true', help='flag to resume training from checkpoint')
