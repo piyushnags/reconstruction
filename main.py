@@ -137,7 +137,7 @@ if __name__ == '__main__':
         model = Autoencoder(depth=args.decoder_depth, interpolation=args.interpolation)
         
         if args.eval_pth:
-            state_dict = torch.load(args.eval_pth)
+            state_dict = torch.load(args.model_pth)
         else:
             ckpt = torch.load(args.model_path)
             state_dict = ckpt['model_state_dict']
