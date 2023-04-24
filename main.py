@@ -46,6 +46,7 @@ def evaluate(model, device, test_loader):
 
     loss_fn = nn.MSELoss()
     losses = []
+    running_psnr = []
 
     with torch.no_grad():
         for img, target in test_loader:
@@ -54,8 +55,13 @@ def evaluate(model, device, test_loader):
             loss = loss_fn(out, target)
             losses.append(loss.item())
 
+            # Compute PSNR for batch
+            psnr = compute_psnr(img, out)
+            running_psnr.append(psnr)
+
     avg_loss = sum(losses)/len(losses)
     print("Average Evaluation Loss: {:.6f}".format( avg_loss ))
+    print(f"Average PSNR: { torch.mean( torch.tensor(running_psnr, dtype=float) ) }")
     return avg_loss
 
 

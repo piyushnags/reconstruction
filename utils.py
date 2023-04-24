@@ -7,6 +7,7 @@ import os, time, io
 import argparse
 import zipfile
 from typing import Any, Tuple, List
+from math import log10, sqrt
 
 # Math and Visualization Imports
 import numpy as np
@@ -174,6 +175,21 @@ def get_loaders(args: Any) -> Tuple[DataLoader, DataLoader]:
     val_loader = DataLoader(val_data, args.batch_size, num_workers=2)
 
     return train_loader, val_loader
+
+
+def compute_psnr(x: Tensor, x_hat: Tensor) -> float:
+    if x.size() != x_hat.size():
+        raise RuntimeError(f'x ({x.shape}) and x_hat ({x_hat.shape}) must have matching dimensions!')
+
+    # 8-bit images have max pixel value of 255
+    M = torch.tensor(255)
+
+    # Compute MSE
+    mse = torch.mean( (x_hat-x)**2 )
+
+    # Compute PSNR = 20log_10( (L-1)/RMSE )
+    psnr = 20 * torch.log10( M / torch.sqrt(mse) )
+    return psnr
 
 
 def plot_losses(args: Any, train_losses: List, val_losses: List):
