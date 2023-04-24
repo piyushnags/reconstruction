@@ -134,21 +134,21 @@ if __name__ == '__main__':
         if not os.path.exists(args.model_path):
             raise ValueError('Model path is invalid!')
 
-        model = Autoencoder(depth=args.decoder_depth, interpolation=args.interpolation)
-        
-        if args.eval_pth:
-            state_dict = torch.load(args.model_path)
-        else:
-            ckpt = torch.load(args.model_path)
-            state_dict = ckpt['model_state_dict']
-        
-        model.load_state_dict(state_dict)
-        _, val_loader = get_loaders(args)
-
         if args.device == 'cuda':
             device = torch.device( 'cuda' if torch.cuda.is_available() else 'cpu' )
         else:
             device = torch.device('cpu')
+
+        model = Autoencoder(depth=args.decoder_depth, interpolation=args.interpolation).to(device)
+        
+        if args.eval_pth:
+            state_dict = torch.load(args.model_path, map_location=device)
+        else:
+            ckpt = torch.load(args.model_path, map_location=device)
+            state_dict = ckpt['model_state_dict']
+        
+        model.load_state_dict(state_dict)
+        _, val_loader = get_loaders(args)
         
         avg_loss = evaluate(model, device, val_loader)
     
