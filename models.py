@@ -9,7 +9,7 @@ from torchvision.models import (
     mobilenet_v3_large,
     MobileNet_V3_Large_Weights
 )
-from utils import unnormalize, AddNoise
+from utils import unnormalize
 
 
 
@@ -30,6 +30,32 @@ class ConvTranspose(nn.Module):
             )
         else:
             raise ValueError('Invalid nonlinearity chosen for ConvTranspose Block')
+    
+
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.block(x)
+        return x
+
+
+
+class ConvBlock(nn.Module):
+    def __init__(self, in_ch, out_ch, k, nonlinearity='hardswish'):
+        super(ConvBlock, self).__init__()
+
+        if nonlinearity == 'hardswish':
+            self.block = nn.Sequential(
+                nn.Conv2d(in_ch, out_ch, k, k),
+                BatchNorm2d(out_ch, eps=0.001, momentum=0.01, affine=True, track_running_stats=True),
+                nn.Hardswish(inplace=True)
+            )
+        elif nonlinearity == 'relu':
+            self.block = nn.Sequential(
+                nn.Conv2d(in_ch, out_ch, k, k),
+                BatchNorm2d(out_ch, eps=0.001, momentum=0.01, affine=True, track_running_stats=True),
+                nn.ReLU(inplace=True)
+            )
+        else:
+            raise ValueError(f'Nonlinearity {nonlinearity} is invalid for ConvBlock. Choose ReLU or Hardswish instead')
     
 
     def forward(self, x: Tensor) -> Tensor:
@@ -94,7 +120,17 @@ class Decoder(nn.Module):
                 raise ValueError('Invalid Decoder depth configuration')
         
         elif interpolation == 'upsample':
-            raise NotImplementedError()
+            layers = nn.Sequential(
+                ConvBlock(672, 112, 1),
+                nn.Upsample(scale_factor=2, mode='bicubic'),
+                ConvBlock(112, 480, 1),
+                nn.Upsample(scale_factor=2, mode='bicubic'),
+                ConvBlock(480, 80, 1),
+                nn.Upsample(scale_factor=2, mode='bicubic'),
+                ConvBlock(80, 16, 1),
+                nn.Upsample(scale_factor=2, mode='bicubic'),
+                ConvBlock(16, 3, 1, 'relu')
+            )
         else:
             raise ValueError(f'interpolation type: {interpolation} is not supported\nUse transpose or upsample instead')
         
