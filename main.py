@@ -119,7 +119,7 @@ if __name__ == '__main__':
     args = parse()
     if args.train:
         train_loader, val_loader = get_loaders(args)
-        model = Autoencoder( args.use_pretrained, depth=args.decoder_depth, noisy=args.noisy )
+        model = Autoencoder( args.use_pretrained, depth=args.decoder_depth, interpolation=args.interpolation )
         train_losses, val_losses = train(args, model, train_loader, val_loader)
         plot_losses(args, train_losses, val_losses)
         visualize_samples(args, model)
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         if not os.path.exists(args.model_path):
             raise ValueError('Model path is invalid!')
 
-        model = Autoencoder(depth=args.decoder_depth, noisy=args.noisy)
+        model = Autoencoder(depth=args.decoder_depth, interpolation=args.interpolation)
         
         if args.eval_pth:
             state_dict = torch.load(args.eval_pth)
@@ -151,7 +151,7 @@ if __name__ == '__main__':
             device = torch.device( 'cuda' if torch.cuda.is_available() else 'cpu' )
         else:
             device = torch.device('cpu')
-        model = Autoencoder(depth=args.decoder_depth, noisy=args.noisy).to(device)
+        model = Autoencoder(depth=args.decoder_depth, interpolation=args.interpolation).to(device)
 
         if args.model_path[-4:] == '.pth':
             model.load_state_dict( torch.load(args.model_path, map_location=device) )

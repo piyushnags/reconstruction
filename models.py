@@ -60,36 +60,43 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, depth: str = 'light'):
+    def __init__(self, depth: str = 'light', interpolation: str = 'transpose'):
         super(Decoder, self).__init__()
-        if depth == 'light':
-            layers = nn.Sequential(
-                ConvTranspose(672, 16, 4),
-                ConvTranspose(16, 3, 4, 'relu'),
-            )
-        elif depth == 'medium':
-            layers = nn.Sequential(
-                ConvTranspose(672, 112, 1),
-                ConvTranspose(112, 80, 2),
-                ConvTranspose(80, 80, 2),
-                ConvTranspose(80, 16, 1),
-                ConvTranspose(16, 16, 4),
-                ConvTranspose(16, 3, 1, 'relu')
-            ) 
-        elif depth == 'deep':
-            layers = nn.Sequential(
-                ConvTranspose(672, 112, 1),
-                ConvTranspose(112, 112, 2),
-                ConvTranspose(112, 480, 1),
-                ConvTranspose(480, 480, 2),
-                ConvTranspose(480, 80, 1),
-                ConvTranspose(80, 80, 2),
-                ConvTranspose(80, 16, 1),
-                ConvTranspose(16, 16, 2),
-                ConvTranspose(16, 3, 1, 'relu')
-            )
+
+        if interpolation == 'transpose':
+            if depth == 'light':
+                layers = nn.Sequential(
+                    ConvTranspose(672, 16, 4),
+                    ConvTranspose(16, 3, 4, 'relu'),
+                )
+            elif depth == 'medium':
+                layers = nn.Sequential(
+                    ConvTranspose(672, 112, 1),
+                    ConvTranspose(112, 80, 2),
+                    ConvTranspose(80, 80, 2),
+                    ConvTranspose(80, 16, 1),
+                    ConvTranspose(16, 16, 4),
+                    ConvTranspose(16, 3, 1, 'relu')
+                ) 
+            elif depth == 'deep':
+                layers = nn.Sequential(
+                    ConvTranspose(672, 112, 1),
+                    ConvTranspose(112, 112, 2),
+                    ConvTranspose(112, 480, 1),
+                    ConvTranspose(480, 480, 2),
+                    ConvTranspose(480, 80, 1),
+                    ConvTranspose(80, 80, 2),
+                    ConvTranspose(80, 16, 1),
+                    ConvTranspose(16, 16, 2),
+                    ConvTranspose(16, 3, 1, 'relu')
+                )
+            else:
+                raise ValueError('Invalid Decoder depth configuration')
+        
+        elif interpolation == 'upsample':
+            raise NotImplementedError()
         else:
-            raise ValueError('Invalid Decoder depth configuration')
+            raise ValueError(f'interpolation type: {interpolation} is not supported\nUse transpose or upsample instead')
         
         self.layers = layers
     
@@ -100,14 +107,14 @@ class Decoder(nn.Module):
 
 
 class Autoencoder(nn.Module):
-    def __init__(self, pretrained: bool = False, depth: str = 'light', noisy: bool = False):
+    def __init__(self, pretrained: bool = False, depth: str = 'light', interpolation: str = 'transpose'):
         super(Autoencoder, self).__init__()
-        self.noisy = noisy
+        self.interpolation = interpolation
         self.encoder = Encoder(pretrained)
         if pretrained:
             for p in self.encoder.parameters():
                 p.requires_grad_(False)
-        self.decoder = Decoder(depth)        
+        self.decoder = Decoder(depth, interpolation)        
         
     
     def inspect_result(self, x: Tensor):
@@ -123,21 +130,9 @@ class Autoencoder(nn.Module):
         print("Min value of output is: {}".format( torch.min(x) ))
         print("Std deviation of output is: {}".format( torch.std(x) ))
         print("Average of output is: {}".format( torch.mean(x) ))
-    
-
-    def _compute_l1_loss(self) -> Tensor:
-        loss = 0
-        for p in self.parameters():
-            loss += torch.sum( torch.abs(p) )
-        return loss
 
     
     def forward(self, x: Tensor) -> Tensor:
         x = self.encoder(x)
-        if self.noisy:
-            noise = (torch.randn(x.size())*0.03 + 0.03)
-            if x.get_device() != -1:
-                noise = noise.to( torch.device('cuda' if torch.cuda.is_available() else 'cpu') )
-            x += noise
         x = self.decoder(x)
         return x
