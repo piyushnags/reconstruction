@@ -252,8 +252,29 @@ def visualize_samples(args: Any, model: nn.Module):
             ax.axis('off')
     
     plt.savefig( os.path.join(save_dir, 'sample_results.png'), dpi='figure' )
-    plt.show()
+
+    # --Visualize a few feature maps--
+
+    # initialize struct and hook
+    activation = {}
+    def get_activation(name):
+        def hook(model, input, output):
+            activation[name] = output.detach()
+        return hook
+    
+    # register the hook
+    model.encoder.register_forward_hook(get_activation('encoder'))
 
     test_img = dataset[0][0].to(device)
     with torch.no_grad():
         model.inspect_result(test_img.unsqueeze(0))
+    
+    fig = plt.figure( figsize=(15,15) )
+    maps = activation['encoder']
+    for i in range(15):
+        img = maps[i]
+        ax = fig.add_subplot(5, 3, i+1)
+        ax.imshow(img, cmap='gray')
+    
+    plt.savefig( os.path.join(save_dir, 'sample_maps.png'), dpi='figure' )
+    
