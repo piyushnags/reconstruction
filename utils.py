@@ -271,7 +271,7 @@ def visualize_samples(args: Any, model: nn.Module):
     
     fig = plt.figure( figsize=(15,15) )
     maps = activation['encoder'].squeeze().cpu()
-    for i in range(15):
+    for i in range(45,60):
         img = maps[i]
         ax = fig.add_subplot(5, 3, i+1)
         ax.imshow(img, cmap='gray')
