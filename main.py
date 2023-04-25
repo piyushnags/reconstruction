@@ -13,8 +13,7 @@ from torch.utils.data import DataLoader
 
 def train_one_epoch(
         model, train_loader, device, 
-        optimizer, epoch, sparse=False,
-        sparse_reg=1e-3
+        optimizer, epoch
     ):
     model.train()
   
@@ -28,8 +27,6 @@ def train_one_epoch(
         out = model(img)
 
         loss = loss_fn(out, target)
-        if sparse:
-            loss += sparse_reg*model._compute_l1_loss()
         loss.backward()
 
         epoch_losses.append(loss.item())
@@ -96,7 +93,7 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
         os.makedirs(args.save_dir)
     
     for epoch in range(1, epochs+1):
-        l1 = train_one_epoch(model, train_loader, device, optimizer, epoch, args.sparse, args.sparse_reg)
+        l1 = train_one_epoch(model, train_loader, device, optimizer, epoch)
         l2 = evaluate(model, device, test_loader)
         scheduler.step()
 
