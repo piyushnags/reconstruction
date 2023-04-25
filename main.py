@@ -61,7 +61,7 @@ def evaluate(model, device, test_loader):
 
     avg_loss = sum(losses)/len(losses)
     print("Average Evaluation Loss: {:.6f}".format( avg_loss ))
-    print(f"Average PSNR: { torch.mean( torch.tensor(running_psnr, dtype=torch.float) ) } dB")
+    print(f"Average PSNR: { torch.mean( torch.tensor(running_psnr, dtype=torch.float) ):.2f } dB")
     return avg_loss
 
 
