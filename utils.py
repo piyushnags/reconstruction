@@ -270,7 +270,7 @@ def visualize_samples(args: Any, model: nn.Module):
         model.inspect_result(test_img.unsqueeze(0))
     
     fig = plt.figure( figsize=(15,15) )
-    maps = activation['encoder'].cpu()
+    maps = activation['encoder'].squeeze().cpu()
     for i in range(15):
         img = maps[i]
         ax = fig.add_subplot(5, 3, i+1)
