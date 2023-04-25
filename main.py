@@ -56,7 +56,7 @@ def evaluate(model, device, test_loader):
             losses.append(loss.item())
 
             # Compute PSNR for batch
-            psnr = compute_psnr(img, out)
+            psnr = compute_psnr(target, out)
             running_psnr.append(psnr.item())
 
     avg_loss = sum(losses)/len(losses)
