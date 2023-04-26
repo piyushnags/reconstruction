@@ -262,8 +262,10 @@ def visualize_samples(args: Any, model: nn.Module):
             activation[name] = output.detach()
         return hook
     
-    # register the hook
+    # register hooks
     model.encoder.register_forward_hook(get_activation('encoder'))
+    for i in range(7):
+        model.decoder.layers[i].register_forward_hook(get_activation(f'd{i}'))
 
     test_img = dataset[0][0].to(device)
     with torch.no_grad():
@@ -277,4 +279,14 @@ def visualize_samples(args: Any, model: nn.Module):
         ax.imshow(img, cmap='gray')
     
     plt.savefig( os.path.join(save_dir, 'sample_maps.png'), dpi='figure' )
+
+    for i in range(7):
+        fig = plt.figure( figsize=(10,10) )
+        maps = activation[f'd{i}'].squeeze().cpu()
+        for j in range(10):
+            img = maps[j]
+            ax = fig.add_subplot(5, 2, j + 1)
+            ax.imshow(img, cmap='gray')
+        
+        plt.savefig( os.path.join(save_dir, f'd{i}_hook.png'), dpi='figure' )
     
