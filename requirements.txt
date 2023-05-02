@@ -2,5 +2,6 @@ torch
 torchvision
 matplotlib
 scikit-learn
+pytorch-msssim
 opencv-python
 tqdm
