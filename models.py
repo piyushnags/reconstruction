@@ -14,6 +14,7 @@ from utils import unnormalize
 
 
 class ConvTranspose(nn.Module):
+    # Transposed Convolution Block
     def __init__(self, in_ch, out_ch, k, nonlinearity='hardswish'):
         super(ConvTranspose, self).__init__()
         if nonlinearity == 'hardswish':
@@ -39,6 +40,7 @@ class ConvTranspose(nn.Module):
 
 
 class ConvBlock(nn.Module):
+    # Standard Convolution Block (with optional non-linearity)
     def __init__(self, in_ch, out_ch, k, nonlinearity='hardswish'):
         super(ConvBlock, self).__init__()
 
@@ -65,6 +67,7 @@ class ConvBlock(nn.Module):
 
 
 class Encoder(nn.Module):
+    # MobileNetV3 Large model that cuts off at C4 by default
     def __init__(self, pretrained: bool = False, hpos: int = 13):
         super(Encoder, self).__init__()
         model = mobilenet_v3_large()
@@ -148,6 +151,7 @@ class Autoencoder(nn.Module):
         self.interpolation = interpolation
         self.encoder = Encoder(pretrained)
         if pretrained:
+            # Freeze the encoder by default
             for p in self.encoder.parameters():
                 p.requires_grad_(False)
         self.decoder = Decoder(depth, interpolation)        

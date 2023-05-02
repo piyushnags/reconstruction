@@ -35,6 +35,10 @@ unnormalize = T.Compose([
 
 
 class ZipDataset(Dataset):
+    '''
+    Class to read a dataset stored in a zipfile. Data is cached into RAM
+    for faster execution
+    '''
     def __init__(self, root_path, cache_into_memory=False):
         if cache_into_memory:
             f = open(root_path, 'rb')
@@ -58,6 +62,9 @@ class ZipDataset(Dataset):
 
 
 class AddNoise(object):
+    '''
+    Custom transform to add variable Gaussian Noise
+    '''
     def __init__(self, var=0.1, mean=0., clip: bool = True):
         self.std = var**0.5
         self.mean = mean

@@ -15,6 +15,20 @@ def train_one_epoch(
         model, train_loader, device, 
         optimizer, epoch
     ):
+    '''
+    Description:
+        Helper function to train one epoch of the model
+    
+    Args:
+        model: nn.Module object of the model
+        train_loader: DataLoader object for the training data
+        device: torch.device object for training on GPU/CPU
+        optimizer: torch optimizer module used to update model weights
+        epoch: Current epoch number for logging
+    
+    Return:
+        None
+    '''
     model.train()
   
     loss_fn = nn.MSELoss()
@@ -39,6 +53,19 @@ def train_one_epoch(
 
 
 def evaluate(model, device, test_loader):
+    '''
+    Description: 
+        Helper function to evaluate model performance
+        on validation/testing data
+    
+    Args:
+        model: nn.Module object for the model
+        device: torch.device object for running inference i.e., GPU/CPU
+        test_loader: DataLoader object for loading validation/testing data
+    
+    Returns:
+        None
+    '''
     model.eval()
 
     loss_fn = nn.MSELoss()
@@ -80,8 +107,26 @@ def evaluate(model, device, test_loader):
 
 
 def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: DataLoader):
+    '''
+    Description:
+        Function containing training loop and to parse args to start training
+    
+    Args:
+        args: User Input options from command line (argparser)
+        model: nn.Module for model object
+        train_loader: DataLoader object for training data
+        test_loader: DataLoader object for testing data
+    
+    Returns:
+        train_losses: list containing training loss from each epoch
+        val_losses: list containing testing/validation loss from each epoch
+    '''
+
+    # Some basic logging
     print('Number of Training samples: {}'.format(len(train_loader)*args.batch_size))
     print('Number of Validation samples: {}'.format(len(test_loader)*args.batch_size))
+
+    # Detect and choose device
     if args.device == 'cuda':
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     else:
@@ -90,6 +135,8 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
     epochs = args.num_epochs
     params = [p for p in model.parameters() if p.requires_grad]
     trainable = sum([p.numel() for p in model.parameters() if p.requires_grad])
+    
+    # More logging
     print("No. of trainable parameters: {}".format(trainable))
     model.to(device)
     
@@ -106,9 +153,11 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
     train_losses = []
     val_losses = []
 
+    # Create save dir if it doesn't exist
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
     
+    # Training Loop
     for epoch in range(1, epochs+1):
         l1 = train_one_epoch(model, train_loader, device, optimizer, epoch)
         l2 = evaluate(model, device, test_loader)
@@ -117,6 +166,7 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
         train_losses.append(l1)
         val_losses.append(l2)
   
+        # Checkpoint the model periodically
         if epoch % args.log_interval == 0:
             torch.save(
                 {
@@ -130,13 +180,17 @@ def train(args: Any, model: nn.Module, train_loader: DataLoader, test_loader: Da
                 os.path.join(args.save_dir, 'ckpt_{}.ckpt'.format(epoch))
             )
   
+    # Save final model
     torch.save(model.state_dict(), os.path.join(args.save_dir, 'model.pth'))
     return train_losses, val_losses
 
 
 
 if __name__ == '__main__':
+    # Initialize argparser object
     args = parse()
+
+    # Training
     if args.train:
         train_loader, val_loader = get_loaders(args)
         model = Autoencoder( args.use_pretrained, depth=args.decoder_depth, interpolation=args.interpolation )
@@ -144,6 +198,7 @@ if __name__ == '__main__':
         plot_losses(args, train_losses, val_losses)
         visualize_samples(args, model)
     
+    # Model evaluation
     elif args.eval_pth or args.eval_ckpt:
         if not os.path.exists(args.model_path):
             raise ValueError('Model path is invalid!')
@@ -166,6 +221,7 @@ if __name__ == '__main__':
         
         avg_loss = evaluate(model, device, val_loader)
     
+    # Generating plots, visualizing layers of the model, etc.
     elif args.visualize:
         if args.device == 'cuda':
             device = torch.device( 'cuda' if torch.cuda.is_available() else 'cpu' )
