@@ -44,7 +44,8 @@ def evaluate(model, device, test_loader):
     loss_fn = nn.MSELoss()
     losses = []
     running_psnr = []
-    running_mssim = []
+    running_ssim = []
+    running_msssim = []
 
     with torch.no_grad():
         for img, target in test_loader:
@@ -59,14 +60,22 @@ def evaluate(model, device, test_loader):
 
             # Compute SSIM for batch
             ssim_ = ssim(target, out, data_range=1, size_average=True)
-            running_mssim.append(ssim_.item())
+            running_ssim.append(ssim_.item())
+
+            # Compute MS SSIM for batch
+            ms_ssim_ = ms_ssim(target, out, data_range=1, size_average=True)
+            running_msssim.append(ms_ssim_.item())
 
     avg_loss = sum(losses)/len(losses)
     print("Average Evaluation Loss: {:.6f}".format( avg_loss ))
     print(f"Average PSNR: { torch.mean( torch.as_tensor(running_psnr) ) } dB")
     print(f"Std. Deviation of PSNR: { torch.std( torch.as_tensor(running_psnr) ) }")
-    print(f"Average SSIM: { torch.mean( torch.as_tensor(running_mssim) ) }")
-    print(f"Std. Deviation of SSIM: { torch.std( torch.as_tensor(running_mssim) ) }")
+
+    print(f"Average SSIM: { torch.mean( torch.as_tensor(running_ssim) ) }")
+    print(f"Std. Deviation of SSIM: { torch.std( torch.as_tensor(running_ssim) ) }")
+
+    print(f"Average MS SSIM: { torch.mean( torch.as_tensor(running_msssim) ) }")
+    print(f"Std. Deviation of MS SSIM: { torch.std( torch.as_tensor(running_msssim) ) }")
     return avg_loss
 
 
